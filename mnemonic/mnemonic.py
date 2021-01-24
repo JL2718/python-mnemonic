@@ -1,6 +1,7 @@
 #
 # Copyright (c) 2013 Pavol Rusnak
 # Copyright (c) 2017 mruddy
+# Copyright (c) 2021 jl2718
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
@@ -61,17 +62,6 @@ def b58encode(v: bytes) -> str:
         string = alphabet[idx : idx + 1] + string
     return string
 
-def b36encode(v: bytes) -> str:
-    alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    p, acc = 1, 0
-    for c in reversed(v):
-        acc += p * c
-        p = p << 8
-    string = ""
-    while acc:
-        acc, idx = divmod(acc, 36)
-        string = alphabet[idx : idx + 1] + string
-    return string
 
 class Mnemonic(object):
     def __init__(self, language: str):
@@ -206,21 +196,12 @@ class Mnemonic(object):
         return result_phrase
 
     def to_int(self,mnemonic: str) -> int:
-        if not self.check(mnemonic): raise ValueError(mnemonic)
-        retval = 0;
-        mnemonic_list = self.normalize_string(mnemonic).split(" ")
-        while mnemonic_list:
-            retval<<=11
-            retval+=self.wordlist.index(mnemonic_list.pop())
-        return retval
+        entropy = self.to_entropy(mnemonic)
+        return int.from_bytes(entropy,byteorder='big',signed=False)
 
-    def from_int(self,val:int) -> str:
-        mnemonic = ""
-        while(val):
-            mnemonic += " " + self.wordlist[val&0x7ff]
-            val >>= 11
-        if not self.check(mnemonic): raise ValueError(val,mnemonic)
-        return mnemonic
+    def from_int(self,num:int) -> str:
+        entropy = num.to_bytes(4*((num.bit_length()+31)//32),byteorder='big')
+        return self.to_mnemonic(entropy)
 
     def to_stamp(self,mnemonic:str)->str:
         def b36_encode(i):

@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2013 Pavol Rusnak
 # Copyright (c) 2017 mruddy
+# Copyright (c) 2021 jl2718
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
@@ -117,21 +118,22 @@ class MnemonicTest(unittest.TestCase):
             "access access acb acc act action", m.expand("access acce acb acc act acti")
         )
 
-    def test_int(self):
+    def test_conv_int(self):
         m = Mnemonic("english")
-        mnemonic = m.generate()
-        print(mnemonic)
-        num = m.to_int(mnemonic)
-        print(num)
-        self.assertEqual(mnemonic,m.from_int(num))
+        for i in range(1000):
+            mnemonic = m.generate()
+            num = m.to_int(mnemonic)
+            mnemonic2 = m.from_int(num)
+            self.assertEqual(mnemonic,mnemonic2)
 
-    def test_stamp(self):
+    def test_conv_stamp(self):
         m = Mnemonic("english")
-        mnemonic = m.generate()
-        print(mnemonic)
-        stamp = m.to_stamp(mnemonic)
-        print(stamp)
-        self.assertEqual(mnemonic,m.from_stamp(stamp))
+        for i in range(1000):
+            mnemonic = m.generate()
+            stamp = m.to_stamp(mnemonic)
+            mnemonic2 = m.from_stamp(stamp)
+            self.assertEqual(mnemonic,mnemonic2)
+
 
 def __main__():
     unittest.main()
