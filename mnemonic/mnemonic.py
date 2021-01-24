@@ -51,18 +51,27 @@ def binary_search(
 # Refactored code segments from <https://github.com/keis/base58>
 def b58encode(v: bytes) -> str:
     alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-
     p, acc = 1, 0
     for c in reversed(v):
         acc += p * c
         p = p << 8
-
     string = ""
     while acc:
         acc, idx = divmod(acc, 58)
         string = alphabet[idx : idx + 1] + string
     return string
 
+def b36encode(v: bytes) -> str:
+    alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    p, acc = 1, 0
+    for c in reversed(v):
+        acc += p * c
+        p = p << 8
+    string = ""
+    while acc:
+        acc, idx = divmod(acc, 36)
+        string = alphabet[idx : idx + 1] + string
+    return string
 
 class Mnemonic(object):
     def __init__(self, language: str):
@@ -195,6 +204,39 @@ class Mnemonic(object):
         else:
             result_phrase = " ".join(result)
         return result_phrase
+
+    def to_int(self,mnemonic: str) -> int:
+        if not self.check(mnemonic): raise ValueError(mnemonic)
+        retval = 0;
+        mnemonic_list = self.normalize_string(mnemonic).split(" ")
+        while mnemonic_list:
+            retval<<=11
+            retval+=self.wordlist.index(mnemonic_list.pop())
+        return retval
+
+    def from_int(self,val:int) -> str:
+        mnemonic = ""
+        while(val):
+            mnemonic += " " + self.wordlist[val&0x7ff]
+            val >>= 11
+        if not self.check(mnemonic): raise ValueError(val,mnemonic)
+        return mnemonic
+
+    def to_stamp(self,mnemonic:str)->str:
+        def b36_encode(i):
+            if i < 0: return "-" + b36_encode(-i)
+            if i < 36: return "0123456789abcdefghijklmnopqrstuvwxyz"[i]
+            return b36_encode(i // 36) + b36_encode(i % 36)
+        num = self.to_int(mnemonic)
+        stamp = b36_encode(num)
+        if int(stamp,36)!=num: raise ValueError(mnemonic,stamp)
+        return stamp
+
+    def from_stamp(self,stamp:str)->str:
+        num = int(stamp,36)
+        mnemonic = self.from_int(num)
+        if not self.check(mnemonic): raise ValueError(stamp,mnemonic)
+        return mnemonic
 
     def check(self, mnemonic: str) -> bool:
         mnemonic_list = self.normalize_string(mnemonic).split(" ")

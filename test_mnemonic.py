@@ -117,6 +117,21 @@ class MnemonicTest(unittest.TestCase):
             "access access acb acc act action", m.expand("access acce acb acc act acti")
         )
 
+    def test_int(self):
+        m = Mnemonic("english")
+        mnemonic = m.generate()
+        print(mnemonic)
+        num = m.to_int(mnemonic)
+        print(num)
+        self.assertEqual(mnemonic,m.from_int(num))
+
+    def test_stamp(self):
+        m = Mnemonic("english")
+        mnemonic = m.generate()
+        print(mnemonic)
+        stamp = m.to_stamp(mnemonic)
+        print(stamp)
+        self.assertEqual(mnemonic,m.from_stamp(stamp))
 
 def __main__():
     unittest.main()
