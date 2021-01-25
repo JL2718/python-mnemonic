@@ -28,7 +28,7 @@ Installation
 
 To install this library and its dependencies use:
 
- ``pip install mnemonic``
+ ``pip install -e .``
 
 Usage examples
 --------------
