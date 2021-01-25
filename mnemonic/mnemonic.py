@@ -333,7 +333,7 @@ def main() -> None:
     elif args.typeout=='seed':
         print(m.to_seed(mnemonic,args.passphrase))
     elif args.typeout=='key':
-        print(m.to_hd_master_key(mnemonic,args.testnet))
+        print(m.to_hd_master_key(m.to_seed(mnemonic,args.passphrase),args.testnet))
 
 
 if __name__ == "__main__":

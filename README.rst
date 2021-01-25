@@ -33,6 +33,15 @@ To install this library and its dependencies use:
 Usage examples
 --------------
 
+From command line:
+
+.. code-block::
+
+    python -m mnemonic
+    python -m mnemonic -h
+    echo "0x61060a2a57086b039cb61679fa62a213" \
+        | python -m mnemonic -i hex -o key
+
 Import library into python project via:
 
 .. code-block:: python
